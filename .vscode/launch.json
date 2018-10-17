@@ -15,7 +15,7 @@
                 "convert",
                 "/home/paris/sprite-test.png",
                 "--tile-height=16",
-                "--metasprite-output=bin",
+                "--metasprite-format=bin",
                 "--bg-color=3"
             ]
         }

@@ -19,10 +19,19 @@ const (
 	MetaspriteOutputBin = "bin"
 )
 
+//Flag names
+const(
+	FlgBgColor ="bg-color"
+	FlgTileH = "tile-height"
+	FlgMetasprFmt = "metasprite-format"
+)
+
 var convertCmd = &cobra.Command{
 	Use:   "convert IMAGE",
 	Short: "Convert a PNG image into a CHR + Metasprite file",
-	Long: `Convert a PNG image into a CHR + Metasprite file. 
+	Long: `Convert a PNG image into a CHR + Metasprite file.
+First the image is converted into a CHR containing tiles of the choosen dimension, then all blank and duplicated tiles are removed.
+A metasprite file is also generated into the choosen format with the (0,0) axis pointing to the bottom left corner of the image.
 The image must be indexed with 4 colors and has the maximum dimension of 128x128 pixels.`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
@@ -46,9 +55,9 @@ var (
 )
 
 func init() {
-	convertCmd.Flags().Uint8VarP(&bgColor, "bg-color", "b", 0, "Color index of the background [0,3] (default 0)")
-	convertCmd.Flags().Uint8VarP(&tileH, "tile-height", "t", 8, "Height of the tiles: 8 for 8x8, 16 for 8x16")
-	convertCmd.Flags().StringVarP(&metasprOut, "metasprite-output", "o", "bin", "Metasprite output format: c, asm, bin")
+	convertCmd.Flags().Uint8VarP(&bgColor, FlgBgColor, "b", 0, "Color index of the background [0,3] (default 0)")
+	convertCmd.Flags().Uint8VarP(&tileH, FlgTileH, "t", 8, "Height of the tiles: 8 for 8x8, 16 for 8x16")
+	convertCmd.Flags().StringVarP(&metasprOut, FlgMetasprFmt, "f", "bin", "Metasprite output format: c, asm, bin")
 	rootCmd.AddCommand(convertCmd)
 }
 
@@ -85,20 +94,19 @@ func convert(filename string) error {
 
 func validate(filename string) error {
 	if bgColor > 3 {
-		return fmt.Errorf("Invalid background color index: %d", bgColor)
+		return fmt.Errorf("Invalid background color index (%s): %d", FlgBgColor, bgColor)
 	}
 	if tileH != 8 && tileH != 16 {
-		return fmt.Errorf("Invalid tile height: %d", tileH)
+		return fmt.Errorf("Invalid tile height (%s): %d", FlgTileH, tileH)
 	}
 	if metasprOut != MetaspriteOutputC && metasprOut != MetaspriteOutputASM && metasprOut != MetaspriteOutputBin {
-		return fmt.Errorf("Invalid metasprite output format: %s", metasprOut)
+		return fmt.Errorf("Invalid metasprite output format (%s): %s", FlgMetasprFmt, metasprOut)
 	}
 
 	pngfile, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
-
 	defer pngfile.Close()
 
 	decoded, err := png.Decode(pngfile)
