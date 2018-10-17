@@ -5,7 +5,7 @@ import (
 	"image/png"
 	"os"
 
-	"github.com/yanct/chr"
+	"github.com/parisoft/yanct/chr"
 )
 
 func main() {
