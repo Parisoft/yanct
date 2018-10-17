@@ -12,13 +12,14 @@ type Sprite struct {
 	Idx byte
 }
 
-// Bytes transform a Sprite into an array of bytes in the format [x, y, opt, idx]
-func (spr *Sprite) Bytes() [4]byte {
-	bytes := [4]byte{}
+// Bytes transform a Sprite into an array of bytes in the format [x, y, idx, opt]
+func (spr *Sprite) Bytes() []byte {
+	bytes := make([]byte, 4)
 	bytes[0] = byte(spr.X)
 	bytes[1] = byte(spr.Y)
-	bytes[2] = spr.Opt
-	bytes[3] = spr.Idx
+	bytes[2] = spr.Idx
+	bytes[3] = spr.Opt
+
 	return bytes
 }
 
