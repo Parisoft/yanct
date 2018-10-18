@@ -6,14 +6,14 @@ import (
 	"strings"
 )
 
-// Metasprite is a table of sprites
+//Metasprite is a table of sprites
 type Metasprite struct {
 	sprites []*Sprite
 }
 
-// NewMetasprite builds a metasprite from a Tileset
-func NewMetasprite(tileset *Tileset) *Metasprite {
-	metasprite := &Metasprite{}
+//NewMetaspriteFromTileset builds a metasprite from a Tileset
+func NewMetaspriteFromTileset(tileset *Tileset) *Metasprite {
+	metasprite := new(Metasprite)
 	rows := tileset.Size() / TilesetMaxRows
 
 	for row := 0; row < rows; row++ {
@@ -30,6 +30,11 @@ func NewMetasprite(tileset *Tileset) *Metasprite {
 	return metasprite
 }
 
+//NewMetaspriteFromFile builds a metasprite from a binary file
+func NewMetaspriteFromFile(binfile *os.File) *Metasprite {
+	return nil
+}
+
 //To8x16 convert the sprites to 8x16 pixels
 func (metasprite *Metasprite) To8x16() {
 	// remove odd lines
@@ -44,25 +49,16 @@ func (metasprite *Metasprite) To8x16() {
 	}
 }
 
-//Print a metasprite as a C array
-func (metasprite *Metasprite) Print() {
-	fmt.Printf("const s8_t metasprite[%d] = {\n", metasprite.Size()*4+1)
-	for _, spr := range metasprite.sprites {
-		fmt.Printf("%s, \n", spr.String())
-	}
-	fmt.Println("0x80};")
-}
-
 //WriteC write the metasprite to a .c and .h files
 func (metasprite *Metasprite) WriteC(filename string) error {
-	cfilename := filename[:len(filename)-3] + "c"
+	cfilename := changeFileExtension(filename, "c")
 	cfile, err := os.OpenFile(cfilename, os.O_CREATE|os.O_TRUNC|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
 	}
 	defer cfile.Close()
 
-	hfilename := filename[:len(filename)-3] + "h"
+	hfilename := changeFileExtension(filename, "h")
 	hfile, err := os.OpenFile(hfilename, os.O_CREATE|os.O_TRUNC|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
@@ -84,7 +80,7 @@ func (metasprite *Metasprite) WriteC(filename string) error {
 
 //WriteAsm write the metasprite to a .inc file
 func (metasprite *Metasprite) WriteAsm(filename string) error {
-	asmfilename := filename[:len(filename)-3] + "inc"
+	asmfilename := changeFileExtension(filename, "inc")
 	asmfile, err := os.OpenFile(asmfilename, os.O_CREATE|os.O_TRUNC|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
@@ -104,7 +100,7 @@ func (metasprite *Metasprite) WriteAsm(filename string) error {
 
 //WriteBin write the metasprite to a .bin file
 func (metasprite *Metasprite) WriteBin(filename string) error {
-	binfilename := filename[:len(filename)-3] + "bin"
+	binfilename := changeFileExtension(filename, "bin")
 	binfile, err := os.OpenFile(binfilename, os.O_CREATE|os.O_TRUNC|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err

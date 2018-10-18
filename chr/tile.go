@@ -5,6 +5,16 @@ type Tile struct {
 	Plane [2][8]byte
 }
 
+//TileDimension is the dimension in pixels of a tile
+type TileDimension string
+
+const(
+	//Tile8x8 have 8x8 pixels
+	Tile8x8 TileDimension = "8x8"
+	//Tile8x16 have 8x16 pixels
+	Tile8x16 TileDimension = "8x16"
+)
+
 //NewTile constructs a new Tile
 func NewTile(bytes []byte) Tile {
 	tile := Tile{}

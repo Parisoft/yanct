@@ -14,12 +14,14 @@ const (
 
 //Tileset is a table of tiles
 type Tileset struct {
-	tiles []*Tile
+	tiles   []*Tile
+	tiledim TileDimension
 }
 
-//NewTileset builds a tileset from an indexed PNG image
-func NewTileset(img image.PalettedImage, bgColorIdx byte) *Tileset {
-	tileset := &Tileset{}
+//NewTilesetFromPNG builds a tileset from an indexed PNG image
+func NewTilesetFromPNG(img image.PalettedImage, bgColorIdx byte) *Tileset {
+	tileset := new(Tileset)
+	tileset.tiledim = Tile8x8
 	for i := 0; i < 256; i++ {
 		tileset.tiles = append(tileset.tiles, &Tile{})
 	}
@@ -53,6 +55,11 @@ func NewTileset(img image.PalettedImage, bgColorIdx byte) *Tileset {
 	return tileset
 }
 
+//NewTilesetFromCHR builds a tileset from a CHR file
+func NewTilesetFromCHR(chrfile *os.File) *Tileset {
+	return nil
+}
+
 //To8x16 convert the tiles to 8x16 pixels
 func (tileset *Tileset) To8x16() {
 	// move sprites at odd lines to 1 line above at odd column
@@ -69,19 +76,26 @@ func (tileset *Tileset) To8x16() {
 	}
 
 	tileset.tiles = tmp
+	tileset.tiledim = Tile8x16
 }
 
-func (tileset Tileset) Write(filename string) {
-	chrfile := filename[:len(filename)-3] + "chr"
+func (tileset Tileset) Write(filename string) error {
+	chrfile := changeFileExtension(filename, "chr")
 	file, err := os.OpenFile(chrfile, os.O_CREATE|os.O_TRUNC|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	for _, tile := range tileset.tiles {
-		file.Write(tile.Plane[0][:])
-		file.Write(tile.Plane[1][:])
+		if _, err := file.Write(tile.Plane[0][:]); err != nil {
+			return err
+		}
+		if _, err := file.Write(tile.Plane[1][:]); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 //At returns a tile from tileset at position i
