@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/parisoft/yanct/chr"
 
@@ -30,9 +31,6 @@ yanct im2spr sprite.png --tile-height=16 --metasprite-format=c`,
 		if len(args) < 1 {
 			return errors.New("Missing image file name")
 		}
-		if len(args) > 1 {
-			return errors.New("Only 1 image can be converted per execution")
-		}
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -45,46 +43,56 @@ yanct im2spr sprite.png --tile-height=16 --metasprite-format=c`,
 		if err := validateTileH(); err != nil {
 			return err
 		}
-		return convert(args[0])
+		if err := validatePal(); err != nil {
+			return err
+		}
+		return convert(args...)
 	},
 }
 
 func init() {
+	img2sprCmd.Flags().Uint8VarP(&flg.pal, FlgPal, "p", 0, "Which palette to use [0,3] (default 0)")
 	img2sprCmd.Flags().Uint8VarP(&flg.bgColor, FlgBgColor, "b", 0, "Color index of the background [0,3] (default 0)")
 	img2sprCmd.Flags().Uint8VarP(&flg.tileH, FlgTileH, "t", 8, "Height of the tiles: 8 for 8x8, 16 for 8x16")
 	img2sprCmd.Flags().StringVarP(&flg.metasprFmt, FlgMetasprFmt, "f", "bin", "Metasprite output format: c, asm, bin")
 	rootCmd.AddCommand(img2sprCmd)
 }
 
-func convert(filename string) error {
-	pngimg, err := openImg(filename)
-	if err != nil {
-		return err
+func convert(filenames ...string) error {
+	for _, filename := range filenames {
+		pngimg, err := openImg(filename)
+		if err != nil {
+			return err
+		}
+
+		tileset := chr.NewTilesetFromPNG(pngimg, flg.bgColor)
+		metasprite := chr.NewMetaspriteFromTileset(tileset, flg.pal)
+
+		if flg.tileH == 16 {
+			tileset.To8x16()
+			metasprite.To8x16()
+		}
+
+		chr.CleanupTiles(tileset, metasprite)
+
+		err = tileset.Write(filename)
+		if err != nil {
+			return err
+		}
+
+		switch flg.metasprFmt {
+		case MetaspriteOutputASM:
+			err = metasprite.WriteAsm(filename)
+		case MetaspriteOutputBin:
+			err = metasprite.WriteBin(filename)
+		case MetaspriteOutputC:
+			err = metasprite.WriteC(filename)
+		}
+
+		if err != nil {
+			return fmt.Errorf("Cannot convert %s: %s", filename, err.Error())
+		}
 	}
 
-	tileset := chr.NewTilesetFromPNG(pngimg, flg.bgColor)
-	metasprite := chr.NewMetaspriteFromTileset(tileset)
-
-	if flg.tileH == 16 {
-		tileset.To8x16()
-		metasprite.To8x16()
-	}
-
-	chr.CleanupTiles(tileset, metasprite)
-
-	err = tileset.Write(filename)
-	if err != nil {
-		return err
-	}
-
-	switch flg.metasprFmt {
-	case MetaspriteOutputASM:
-		err = metasprite.WriteAsm(filename)
-	case MetaspriteOutputBin:
-		err = metasprite.WriteBin(filename)
-	case MetaspriteOutputC:
-		err = metasprite.WriteC(filename)
-	}
-
-	return err
+	return nil
 }

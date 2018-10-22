@@ -12,7 +12,7 @@ type Metasprite struct {
 }
 
 //NewMetaspriteFromTileset builds a metasprite from a Tileset
-func NewMetaspriteFromTileset(tileset *Tileset) *Metasprite {
+func NewMetaspriteFromTileset(tileset *Tileset, opt uint8) *Metasprite {
 	metasprite := new(Metasprite)
 	rows := tileset.Size() / TilesetMaxRows
 
@@ -21,7 +21,7 @@ func NewMetaspriteFromTileset(tileset *Tileset) *Metasprite {
 			metasprite.sprites = append(metasprite.sprites, &Sprite{
 				X:   int8(col * 8),
 				Y:   int8((row - rows) * 8),
-				Opt: 0,
+				Opt: opt,
 				Idx: byte(row*TilesetMaxCols + col),
 			})
 		}

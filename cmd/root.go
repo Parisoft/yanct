@@ -12,6 +12,7 @@ import (
 
 //Flag names
 const (
+	FlgPal        = "pal"
 	FlgBgColor    = "bg-color"
 	FlgTileH      = "tile-height"
 	FlgMetasprFmt = "metasprite-format"
@@ -19,6 +20,7 @@ const (
 )
 
 type flag struct {
+	pal        uint8
 	bgColor    uint8
 	tileH      uint8
 	metasprFmt string
@@ -39,6 +41,13 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func validatePal() error {
+	if flg.pal > 3 {
+		return fmt.Errorf("Invalid palette index (%s): %d", FlgPal, flg.pal)
+	}
+	return nil
 }
 
 func validateBgColor() error {
