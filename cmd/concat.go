@@ -12,6 +12,9 @@ import (
 var concatCmd = &cobra.Command{
 	Use:   "concat CHR_1 CHR_2 [...CHR_N]",
 	Short: "Concatenate many CHR files into one",
+	Long: `Concatenate many CHR files into one.
+All files are appended to the first one. After each append, all duplicated tiles are removed.
+If a binary metasprite is found on the same path of a CHR file being appended, it's updated to follow the concatenated file.`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 2 {
 			return errors.New("concat requires 2 CHR files or more")
@@ -28,7 +31,7 @@ var concatCmd = &cobra.Command{
 		if err := validateChrOut(); err != nil {
 			return err
 		}
-		
+
 		return concat(args...)
 	},
 }
@@ -41,10 +44,14 @@ func init() {
 }
 
 func concat(chrlist ...string) error {
+	tiledim := chr.Tile8x8
+	if flg.tileH == 16 {
+		tiledim = chr.Tile8x16
+	}
 	tilesets := make([]*chr.Tileset, len(chrlist))
 	metasprites := make([]*chr.Metasprite, len(chrlist))
 	binnames := make([]string, len(chrlist))
-	for _, chrfilename := range chrlist {
+	for i, chrfilename := range chrlist {
 		chrfile, err := os.Open(chrfilename)
 		if err != nil {
 			return err
@@ -52,38 +59,32 @@ func concat(chrlist ...string) error {
 		defer chrfile.Close()
 
 		binfilename := chrfilename[:len(chrfilename)-3] + "bin"
-		binnames = append(binnames, binfilename)
+		binnames[i] = binfilename
 		binfile, err := os.Open(binfilename)
 		if err == nil {
 			defer binfile.Close()
-			metasprites = append(metasprites, chr.NewMetaspriteFromFile(binfile))
-		} else if os.IsNotExist(err) {
-			metasprites = append(metasprites, nil)
-		} else {
+			var metaspr *chr.Metasprite
+			if metaspr, err = chr.NewMetaspriteFromFile(binfile); err != nil {
+				return err
+			}
+			metasprites[i] = metaspr
+		} else if !os.IsNotExist(err) {
 			return err
 		}
 
-		tilesets = append(tilesets, chr.NewTilesetFromCHR(chrfile))
-	}
-
-	pivot := new(chr.Tileset)
-	if flg.tileH == 16 {
-		pivot.To8x16()
-
-		for i, tileset := range tilesets {
-			tileset.To8x16()
-
-			if metasprite := metasprites[i]; metasprite != nil {
-				metasprite.To8x16()
-			}
+		var tileset *chr.Tileset
+		if tileset, err = chr.NewTilesetFromCHR(chrfile, tiledim); err != nil {
+			return err
 		}
+		tilesets[i] = tileset
 	}
 
+	output := chr.NewTileset(tiledim)
 	for i, tileset := range tilesets {
-		chr.ConcatTiles(pivot, tileset, metasprites[i])
+		chr.ConcatTiles(output, tileset, metasprites[i])
 	}
 
-	pivot.Write(flg.chrOut)
+	output.Write(flg.chrOut)
 
 	for i, metasprite := range metasprites {
 		if metasprite != nil {

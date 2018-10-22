@@ -31,8 +31,28 @@ func NewMetaspriteFromTileset(tileset *Tileset) *Metasprite {
 }
 
 //NewMetaspriteFromFile builds a metasprite from a binary file
-func NewMetaspriteFromFile(binfile *os.File) *Metasprite {
-	return nil
+func NewMetaspriteFromFile(binfile *os.File) (*Metasprite, error) {
+	stat, err := binfile.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	bytes := make([]byte, stat.Size())
+	if _, err := binfile.Read(bytes); err != nil {
+		return nil, err
+	}
+
+	metasrp := new(Metasprite)
+	for i := 0; i < len(bytes)-1; i += 4 {
+		metasrp.sprites = append(metasrp.sprites, &Sprite{
+			X:   int8(bytes[i]),
+			Y:   int8(bytes[i+1]),
+			Idx: bytes[i+2],
+			Opt: bytes[i+3],
+		})
+	}
+
+	return metasrp, nil
 }
 
 //To8x16 convert the sprites to 8x16 pixels

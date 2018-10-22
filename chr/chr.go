@@ -2,6 +2,11 @@ package chr
 
 import "strings"
 
+const (
+	spriteMirrorOpt = (1 << 6)
+	spriteFlipOpt   = (1 << 7)
+)
+
 //CleanupTiles removes empty and duplicated tiles
 func CleanupTiles(tileset *Tileset, metasprite *Metasprite) {
 	if tileset.tiledim == Tile8x16 {
@@ -73,6 +78,59 @@ func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite) {
 					for _, spr := range metasprite.sprites {
 						if spr.Idx == byte(i) {
 							spr.Idx = byte(j)
+						} else if spr.Idx > byte(i) {
+							spr.Idx--
+						}
+					}
+				}
+
+				break
+			}
+
+			if tileset.At(i).Mirrored(tileset.At(j)) {
+				tileset.RemoveAt(i)
+
+				if metasprite != nil {
+					for _, spr := range metasprite.sprites {
+						if spr.Idx == byte(i) {
+							spr.Idx = byte(j)
+							spr.Opt |= spriteMirrorOpt
+						} else if spr.Idx > byte(i) {
+							spr.Idx--
+						}
+					}
+				}
+
+				break
+			}
+
+			if tileset.At(i).Flipped(tileset.At(j)) {
+				tileset.RemoveAt(i)
+
+				if metasprite != nil {
+					for _, spr := range metasprite.sprites {
+						if spr.Idx == byte(i) {
+							spr.Idx = byte(j)
+							spr.Opt |= spriteFlipOpt
+						} else if spr.Idx > byte(i) {
+							spr.Idx--
+						}
+					}
+				}
+
+				break
+			}
+
+			if tileset.At(i).MirrorFlipped(tileset.At(j)) {
+				tileset.RemoveAt(i)
+
+				if metasprite != nil {
+					for _, spr := range metasprite.sprites {
+						if spr.Idx == byte(i) {
+							spr.Idx = byte(j)
+							spr.Opt |= spriteFlipOpt | spriteMirrorOpt
+						} else if spr.Idx > byte(i) {
+							spr.Idx--
 						}
 					}
 				}
@@ -95,6 +153,62 @@ func removeDuplicated8x16Tiles(tileset *Tileset, metasprite *Metasprite) {
 					for _, spr := range metasprite.sprites {
 						if spr.Idx == byte(i) {
 							spr.Idx = byte(j)
+						} else if spr.Idx > byte(i) {
+							spr.Idx -= 2
+						}
+					}
+				}
+
+				break
+			}
+
+			if tileset.At(i).Mirrored(tileset.At(j)) && tileset.At(i+1).Mirrored(tileset.At(j+1)) {
+				tileset.RemoveAt(i + 1)
+				tileset.RemoveAt(i)
+
+				if metasprite != nil {
+					for _, spr := range metasprite.sprites {
+						if spr.Idx == byte(i) {
+							spr.Idx = byte(j)
+							spr.Opt |= spriteMirrorOpt
+						} else if spr.Idx > byte(i) {
+							spr.Idx -= 2
+						}
+					}
+				}
+
+				break
+			}
+
+			if tileset.At(i).Flipped(tileset.At(j+1)) && tileset.At(i+1).Flipped(tileset.At(j)) {
+				tileset.RemoveAt(i + 1)
+				tileset.RemoveAt(i)
+
+				if metasprite != nil {
+					for _, spr := range metasprite.sprites {
+						if spr.Idx == byte(i) {
+							spr.Idx = byte(j)
+							spr.Opt |= spriteFlipOpt
+						} else if spr.Idx > byte(i) {
+							spr.Idx -= 2
+						}
+					}
+				}
+
+				break
+			}
+
+			if tileset.At(i).MirrorFlipped(tileset.At(j+1)) && tileset.At(i+1).MirrorFlipped(tileset.At(j)) {
+				tileset.RemoveAt(i + 1)
+				tileset.RemoveAt(i)
+
+				if metasprite != nil {
+					for _, spr := range metasprite.sprites {
+						if spr.Idx == byte(i) {
+							spr.Idx = byte(j)
+							spr.Opt |= spriteFlipOpt | spriteMirrorOpt
+						} else if spr.Idx > byte(i) {
+							spr.Idx -= 2
 						}
 					}
 				}

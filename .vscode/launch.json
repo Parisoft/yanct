@@ -12,11 +12,12 @@
             "program": "${workspaceFolder}",
             "env": {},
             "args": [
-                "img2spr",
-                "/home/paris/sprite-test.png",
+                "concat",
+                "/home/paris/sprite-test.chr",
+                "/home/paris/sprite-test1.chr",
+                "/home/paris/sprite-test2.chr",
                 "--tile-height=16",
-                "--metasprite-format=bin",
-                "--bg-color=3"
+                "-o=/home/paris/sprite-test-all.chr"
             ]
         }
     ]

@@ -56,15 +56,40 @@ func NewTilesetFromPNG(img image.PalettedImage, bgColorIdx byte) *Tileset {
 }
 
 //NewTilesetFromCHR builds a tileset from a CHR file
-func NewTilesetFromCHR(chrfile *os.File) *Tileset {
-	return nil
+func NewTilesetFromCHR(chrfile *os.File, dim TileDimension) (*Tileset, error) {
+	stat, err := chrfile.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	bytes := make([]byte, stat.Size())
+	if _, err := chrfile.Read(bytes); err != nil {
+		return nil, err
+	}
+
+	tileset := NewTileset(dim)
+	for i := 0; i < len(bytes); i += 16 {
+		tile := new(Tile)
+		tileset.tiles = append(tileset.tiles, tile)
+		for b := 0; b < 8; b++ {
+			tile.Plane[0][b] = bytes[i+b]
+			tile.Plane[1][b] = bytes[i+b+8]
+		}
+	}
+
+	return tileset, nil
+}
+
+//NewTileset builds an empty tileset for a given tile dimension
+func NewTileset(tiledim TileDimension) *Tileset {
+	return &Tileset{tiledim: tiledim}
 }
 
 //To8x16 convert the tiles to 8x16 pixels
 func (tileset *Tileset) To8x16() {
-	// move sprites at odd lines to 1 line above at odd column
 	tmp := make([]*Tile, len(tileset.tiles))
 
+	// move sprites at odd lines to 1 line above at odd column
 	for row, i := 0, -1; row < tileset.Size()/TilesetMaxRows; row += 2 {
 		for col := 0; col < TilesetMaxCols; col++ {
 			idx := row*TilesetMaxCols + col
