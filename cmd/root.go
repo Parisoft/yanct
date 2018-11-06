@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"image"
 	"image/png"
@@ -92,7 +91,7 @@ func openImg(filename string) (image.PalettedImage, error) {
 
 	img, ok := decoded.(image.PalettedImage)
 	if !ok || img.Bounds().Dx() > 128 || img.Bounds().Dy() > 128 {
-		return nil, errors.New("The image must be a PNG file indexed with 4 colors and has the maximum dimension of 128x128 pixels")
+		return nil, fmt.Errorf("Image '%s' must be a PNG file indexed with 4 colors and has the maximum dimension of 128x128 pixels", filename)
 	}
 
 	return img, nil

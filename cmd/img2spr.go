@@ -17,7 +17,7 @@ const (
 )
 
 var img2sprCmd = &cobra.Command{
-	Use:   "img2spr IMAGE",
+	Use:   "img2spr IMAGE_1 [...IMAGE_N]",
 	Short: "Convert a PNG image into a CHR + Metasprite file",
 	Long: `Convert a PNG image into a CHR + Metasprite file.
 First the image is converted into a CHR containing tiles of the choosen dimension, then all blank and duplicated tiles are removed.
