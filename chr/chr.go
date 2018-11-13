@@ -20,8 +20,10 @@ func CleanupTiles(tileset *Tileset, metasprite *Metasprite) {
 
 //ConcatTiles concatenate the 2nd tileset onto the 1st tileset, updating those respective metrasprites
 func ConcatTiles(tileset1, tileset2 *Tileset, metasprite2 *Metasprite) {
-	for _, spr := range metasprite2.sprites {
-		spr.Idx += byte(tileset1.Size())
+	if metasprite2 != nil {
+		for _, spr := range metasprite2.sprites {
+			spr.Idx += byte(tileset1.Size())
+		}
 	}
 
 	tileset1.tiles = append(tileset1.tiles, tileset2.tiles...)
