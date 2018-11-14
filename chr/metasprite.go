@@ -12,15 +12,15 @@ type Metasprite struct {
 }
 
 //NewMetaspriteFromTileset builds a metasprite from a Tileset
-func NewMetaspriteFromTileset(tileset *Tileset, opt uint8) *Metasprite {
+func NewMetaspriteFromTileset(tileset *Tileset, dx, dy int8, opt uint8) *Metasprite {
 	metasprite := new(Metasprite)
 	rows := tileset.Size() / TilesetMaxRows
 
 	for row := 0; row < rows; row++ {
 		for col := 0; col < TilesetMaxCols; col++ {
 			metasprite.sprites = append(metasprite.sprites, &Sprite{
-				X:   int8(col * 8),
-				Y:   int8((row - rows) * 8),
+				X:   int8(col * 8) + dx,
+				Y:   int8((row - rows) * 8) + dy,
 				Opt: opt,
 				Idx: byte(row*TilesetMaxCols + col),
 			})

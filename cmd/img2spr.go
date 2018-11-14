@@ -54,6 +54,8 @@ func init() {
 	img2sprCmd.Flags().Uint8VarP(&flg.pal, FlgPal, "p", 0, "Which palette to use [0,3] (default 0)")
 	img2sprCmd.Flags().Uint8VarP(&flg.bgColor, FlgBgColor, "b", 0, "Color index of the background [0,3] (default 0)")
 	img2sprCmd.Flags().Uint8VarP(&flg.tileH, FlgTileH, "t", 8, "Height of the tiles: 8 for 8x8, 16 for 8x16")
+	img2sprCmd.Flags().Int8Var(&flg.dx, FlgDx, 0, "Value to add/subtract to all X axis")
+	img2sprCmd.Flags().Int8Var(&flg.dy, FlgDy, 0, "Value to add/subtract to all Y axis")
 	img2sprCmd.Flags().StringVarP(&flg.metasprFmt, FlgMetasprFmt, "f", "bin", "Metasprite output format: c, asm, bin")
 	rootCmd.AddCommand(img2sprCmd)
 }
@@ -66,7 +68,7 @@ func convert(filenames ...string) error {
 		}
 
 		tileset := chr.NewTilesetFromPNG(pngimg, flg.bgColor)
-		metasprite := chr.NewMetaspriteFromTileset(tileset, flg.pal)
+		metasprite := chr.NewMetaspriteFromTileset(tileset, flg.dx, flg.dy, flg.pal)
 
 		if flg.tileH == 16 {
 			tileset.To8x16()

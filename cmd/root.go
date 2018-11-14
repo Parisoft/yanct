@@ -16,6 +16,8 @@ const (
 	FlgTileH      = "tile-height"
 	FlgMetasprFmt = "metasprite-format"
 	FlgChrOut     = "chr-output"
+	FlgDx         = "dx"
+	FlgDy         = "dy"
 )
 
 type flag struct {
@@ -24,6 +26,8 @@ type flag struct {
 	tileH      uint8
 	metasprFmt string
 	chrOut     string
+	dx         int8
+	dy         int8
 }
 
 var flg flag
