@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"errors"
 	"os"
 
@@ -68,6 +69,7 @@ func concat(chrlist ...string) error {
 				return err
 			}
 			metasprites[i] = metaspr
+			fmt.Printf("meta for %s is %s\n", chrfilename, binfilename)
 		} else if !os.IsNotExist(err) {
 			return err
 		}
