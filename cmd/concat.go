@@ -28,7 +28,7 @@ If a binary metasprite is found on the same path of a CHR file being appended, i
 		if err := validateTileH(); err != nil {
 			return err
 		}
-		if err := validateChrOut(); err != nil {
+		if err := validateOutFileName(); err != nil {
 			return err
 		}
 
@@ -38,8 +38,8 @@ If a binary metasprite is found on the same path of a CHR file being appended, i
 
 func init() {
 	concatCmd.Flags().Uint8VarP(&flg.tileH, FlgTileH, "t", 8, "Height of the tiles: 8 for 8x8, 16 for 8x16")
-	concatCmd.Flags().StringVarP(&flg.chrOut, FlgChrOut, "o", "", "output CHR file name")
-	concatCmd.MarkFlagRequired(FlgChrOut)
+	concatCmd.Flags().StringVarP(&flg.fileOut, FlgOutFile, "o", "", "output CHR file name")
+	concatCmd.MarkFlagRequired(FlgOutFile)
 	rootCmd.AddCommand(concatCmd)
 }
 
@@ -84,7 +84,7 @@ func concat(chrlist ...string) error {
 		chr.ConcatTiles(output, tileset, metasprites[i])
 	}
 
-	output.Write(flg.chrOut)
+	output.Write(flg.fileOut)
 
 	for i, metasprite := range metasprites {
 		if metasprite != nil {

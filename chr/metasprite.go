@@ -19,8 +19,8 @@ func NewMetaspriteFromTileset(tileset *Tileset, dx, dy int8, opt uint8) *Metaspr
 	for row := 0; row < rows; row++ {
 		for col := 0; col < TilesetMaxCols; col++ {
 			metasprite.sprites = append(metasprite.sprites, &Sprite{
-				X:   int8(col * 8) + dx,
-				Y:   int8((row - rows) * 8) + dy,
+				X:   int8(col*8) + dx,
+				Y:   int8((row-rows)*8) + dy,
 				Opt: opt,
 				Idx: byte(row*TilesetMaxCols + col),
 			})
@@ -67,6 +67,11 @@ func (metasprite *Metasprite) To8x16() {
 	for _, spr := range metasprite.sprites {
 		spr.Idx = (spr.Idx/16)*16 + (spr.Idx%16)*2
 	}
+}
+
+//Merge merge a metasprite into this one
+func (metasprite *Metasprite) Merge(other *Metasprite) {
+	metasprite.sprites = append(metasprite.sprites, other.sprites...)
 }
 
 //WriteC write the metasprite to a .c and .h files

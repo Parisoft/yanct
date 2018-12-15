@@ -15,7 +15,7 @@ const (
 	FlgBgColor    = "bg-color"
 	FlgTileH      = "tile-height"
 	FlgMetasprFmt = "metasprite-format"
-	FlgChrOut     = "chr-output"
+	FlgOutFile    = "output"
 	FlgDx         = "dx"
 	FlgDy         = "dy"
 )
@@ -25,7 +25,7 @@ type flag struct {
 	bgColor    uint8
 	tileH      uint8
 	metasprFmt string
-	chrOut     string
+	fileOut    string
 	dx         int8
 	dy         int8
 }
@@ -74,9 +74,9 @@ func validateMetasprFmt() error {
 	return nil
 }
 
-func validateChrOut() error {
-	if len(flg.chrOut) == 0 {
-		return fmt.Errorf("Invalid output CHR file name (%s): %s", FlgChrOut, flg.chrOut)
+func validateOutFileName() error {
+	if len(flg.fileOut) == 0 {
+		return fmt.Errorf("Invalid output file name (%s): %s", FlgOutFile, flg.fileOut)
 	}
 	return nil
 }
