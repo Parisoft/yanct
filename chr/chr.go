@@ -97,7 +97,7 @@ func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite) {
 					for _, spr := range metasprite.sprites {
 						if spr.Idx == byte(i) {
 							spr.Idx = byte(j)
-							spr.Opt |= spriteMirrorOpt
+							spr.Opt ^= spriteMirrorOpt
 						} else if spr.Idx > byte(i) {
 							spr.Idx--
 						}
@@ -114,7 +114,7 @@ func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite) {
 					for _, spr := range metasprite.sprites {
 						if spr.Idx == byte(i) {
 							spr.Idx = byte(j)
-							spr.Opt |= spriteFlipOpt
+							spr.Opt ^= spriteFlipOpt
 						} else if spr.Idx > byte(i) {
 							spr.Idx--
 						}
@@ -131,7 +131,7 @@ func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite) {
 					for _, spr := range metasprite.sprites {
 						if spr.Idx == byte(i) {
 							spr.Idx = byte(j)
-							spr.Opt |= spriteFlipOpt | spriteMirrorOpt
+							spr.Opt ^= (spriteFlipOpt | spriteMirrorOpt)
 						} else if spr.Idx > byte(i) {
 							spr.Idx--
 						}
@@ -173,7 +173,7 @@ func removeDuplicated8x16Tiles(tileset *Tileset, metasprite *Metasprite) {
 					for _, spr := range metasprite.sprites {
 						if spr.Idx == byte(i) {
 							spr.Idx = byte(j)
-							spr.Opt |= spriteMirrorOpt
+							spr.Opt ^= spriteMirrorOpt
 						} else if spr.Idx > byte(i) {
 							spr.Idx -= 2
 						}
@@ -191,7 +191,7 @@ func removeDuplicated8x16Tiles(tileset *Tileset, metasprite *Metasprite) {
 					for _, spr := range metasprite.sprites {
 						if spr.Idx == byte(i) {
 							spr.Idx = byte(j)
-							spr.Opt |= spriteFlipOpt
+							spr.Opt ^= spriteFlipOpt
 						} else if spr.Idx > byte(i) {
 							spr.Idx -= 2
 						}
@@ -209,7 +209,7 @@ func removeDuplicated8x16Tiles(tileset *Tileset, metasprite *Metasprite) {
 					for _, spr := range metasprite.sprites {
 						if spr.Idx == byte(i) {
 							spr.Idx = byte(j)
-							spr.Opt |= spriteFlipOpt | spriteMirrorOpt
+							spr.Opt ^= (spriteFlipOpt | spriteMirrorOpt)
 						} else if spr.Idx > byte(i) {
 							spr.Idx -= 2
 						}
