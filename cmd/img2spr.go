@@ -57,6 +57,8 @@ func init() {
 	img2sprCmd.Flags().Int8Var(&flg.dx, FlgDx, 0, "Value to add/subtract to all X axis")
 	img2sprCmd.Flags().Int8Var(&flg.dy, FlgDy, 0, "Value to add/subtract to all Y axis")
 	img2sprCmd.Flags().StringVarP(&flg.metasprFmt, FlgMetasprFmt, "f", "bin", "Metasprite output format: c, asm, bin")
+	img2sprCmd.Flags().BoolVar(&flg.delMirror, FlgDelMirror, true, "Discard mirrored tiles")
+	img2sprCmd.Flags().BoolVar(&flg.delFlip, FlgDelFlip, true, "Discard flipped tiles")
 	rootCmd.AddCommand(img2sprCmd)
 }
 
@@ -75,7 +77,7 @@ func convert(filenames ...string) error {
 			metasprite.To8x16()
 		}
 
-		chr.CleanupTiles(tileset, metasprite)
+		chr.CleanupTiles(tileset, metasprite, flg.delMirror, flg.delFlip)
 
 		err = tileset.Write(filename)
 		if err != nil {

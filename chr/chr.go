@@ -8,18 +8,18 @@ const (
 )
 
 //CleanupTiles removes empty and duplicated tiles
-func CleanupTiles(tileset *Tileset, metasprite *Metasprite) {
+func CleanupTiles(tileset *Tileset, metasprite *Metasprite, delMirror, delFlip bool) {
 	if tileset.tiledim == Tile8x16 {
 		removeEmpty8x16Tiles(tileset, metasprite)
-		removeDuplicated8x16Tiles(tileset, metasprite)
+		removeDuplicated8x16Tiles(tileset, metasprite, delMirror, delFlip)
 	} else {
 		removeEmpty8x8Tiles(tileset, metasprite)
-		removeDuplicated8x8Tiles(tileset, metasprite)
+		removeDuplicated8x8Tiles(tileset, metasprite, delMirror, delFlip)
 	}
 }
 
 //ConcatTiles concatenate the 2nd tileset onto the 1st tileset, updating those respective metrasprites
-func ConcatTiles(tileset1, tileset2 *Tileset, metasprite2 *Metasprite) {
+func ConcatTiles(tileset1, tileset2 *Tileset, metasprite2 *Metasprite, delMirror, delFlip bool) {
 	if metasprite2 != nil {
 		len := byte(tileset1.Size())
 		for _, spr := range metasprite2.sprites {
@@ -30,9 +30,9 @@ func ConcatTiles(tileset1, tileset2 *Tileset, metasprite2 *Metasprite) {
 	tileset1.tiles = append(tileset1.tiles, tileset2.tiles...)
 
 	if tileset1.tiledim == Tile8x16 {
-		removeDuplicated8x16Tiles(tileset1, metasprite2)
+		removeDuplicated8x16Tiles(tileset1, metasprite2, delMirror, delFlip)
 	} else {
-		removeDuplicated8x8Tiles(tileset1, metasprite2)
+		removeDuplicated8x8Tiles(tileset1, metasprite2, delMirror, delFlip)
 	}
 }
 
@@ -71,7 +71,7 @@ func removeEmpty8x16Tiles(tileset *Tileset, metasprite *Metasprite) {
 	}
 }
 
-func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite) {
+func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite, delMirror, delFlip bool) {
 	for i := tileset.Size() - 1; i >= 0; i-- {
 		for j := 0; j < i; j++ {
 			if tileset.At(i).Equals(tileset.At(j)) {
@@ -90,7 +90,7 @@ func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite) {
 				break
 			}
 
-			if tileset.At(i).Mirrored(tileset.At(j)) {
+			if delMirror && tileset.At(i).Mirrored(tileset.At(j)) {
 				tileset.RemoveAt(i)
 
 				if metasprite != nil {
@@ -107,7 +107,7 @@ func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite) {
 				break
 			}
 
-			if tileset.At(i).Flipped(tileset.At(j)) {
+			if delFlip && tileset.At(i).Flipped(tileset.At(j)) {
 				tileset.RemoveAt(i)
 
 				if metasprite != nil {
@@ -124,7 +124,7 @@ func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite) {
 				break
 			}
 
-			if tileset.At(i).MirrorFlipped(tileset.At(j)) {
+			if delMirror && delFlip && tileset.At(i).MirrorFlipped(tileset.At(j)) {
 				tileset.RemoveAt(i)
 
 				if metasprite != nil {
@@ -145,7 +145,7 @@ func removeDuplicated8x8Tiles(tileset *Tileset, metasprite *Metasprite) {
 
 }
 
-func removeDuplicated8x16Tiles(tileset *Tileset, metasprite *Metasprite) {
+func removeDuplicated8x16Tiles(tileset *Tileset, metasprite *Metasprite, delMirror, delFlip bool) {
 	for i := tileset.Size() - 2; i >= 0; i -= 2 {
 		for j := 0; j < i; j += 2 {
 			if tileset.At(i).Equals(tileset.At(j)) && tileset.At(i+1).Equals(tileset.At(j+1)) {
@@ -165,7 +165,7 @@ func removeDuplicated8x16Tiles(tileset *Tileset, metasprite *Metasprite) {
 				break
 			}
 
-			if tileset.At(i).Mirrored(tileset.At(j)) && tileset.At(i+1).Mirrored(tileset.At(j+1)) {
+			if delMirror && tileset.At(i).Mirrored(tileset.At(j)) && tileset.At(i+1).Mirrored(tileset.At(j+1)) {
 				tileset.RemoveAt(i + 1)
 				tileset.RemoveAt(i)
 
@@ -183,7 +183,7 @@ func removeDuplicated8x16Tiles(tileset *Tileset, metasprite *Metasprite) {
 				break
 			}
 
-			if tileset.At(i).Flipped(tileset.At(j+1)) && tileset.At(i+1).Flipped(tileset.At(j)) {
+			if delFlip && tileset.At(i).Flipped(tileset.At(j+1)) && tileset.At(i+1).Flipped(tileset.At(j)) {
 				tileset.RemoveAt(i + 1)
 				tileset.RemoveAt(i)
 
@@ -201,7 +201,7 @@ func removeDuplicated8x16Tiles(tileset *Tileset, metasprite *Metasprite) {
 				break
 			}
 
-			if tileset.At(i).MirrorFlipped(tileset.At(j+1)) && tileset.At(i+1).MirrorFlipped(tileset.At(j)) {
+			if delMirror && delFlip && tileset.At(i).MirrorFlipped(tileset.At(j+1)) && tileset.At(i+1).MirrorFlipped(tileset.At(j)) {
 				tileset.RemoveAt(i + 1)
 				tileset.RemoveAt(i)
 

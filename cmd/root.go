@@ -18,6 +18,8 @@ const (
 	FlgOutFile    = "output"
 	FlgDx         = "dx"
 	FlgDy         = "dy"
+	FlgDelMirror  = "del-mirror"
+	FlgDelFlip	  = "del-flip"
 )
 
 type flag struct {
@@ -28,6 +30,8 @@ type flag struct {
 	fileOut    string
 	dx         int8
 	dy         int8
+	delMirror  bool
+	delFlip    bool
 }
 
 var flg flag
